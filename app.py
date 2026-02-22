@@ -1,16 +1,23 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# Ruta principal
-@app.route('/')
+@app.route("/")
 def inicio():
-    return "Biblioteca Virtual – Consulta de libros y disponibilidad"
+    return render_template("index.html")
 
-# Ruta dinámica
-@app.route('/libro/<titulo>')
-def libro(titulo):
-    return f"Libro: {titulo} – consulta exitosa."
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+@app.route("/libros")
+def libros():
+    lista_libros = [
+        {"titulo": "Cien años de soledad", "autor": "Gabriel García Márquez"},
+        {"titulo": "Don Quijote de la Mancha", "autor": "Miguel de Cervantes"},
+        {"titulo": "Harry Potter y la piedra filosofal", "autor": "J.K. Rowling"}
+    ]
+    return render_template("libros.html", libros=lista_libros)
+
+if __name__ == "__main__":
+    app.run(debug=True)
