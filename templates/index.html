@@ -1,6 +1,30 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h2>Bienvenida a la Biblioteca Virtual</h2>
-<p>Explora nuestra colección de libros.</p>
+
+<h2 class="titulo-panel">Bienvenida al Sistema de Gestión de Biblioteca</h2>
+
+<p>
+  Este sistema permite administrar el inventario de libros de la biblioteca
+  mediante operaciones de agregar, buscar, actualizar y eliminar registros.
+</p>
+
+<div class="menu-superior">
+  <a href="/libros">Ir al Inventario</a>
+  <a href="/about">Acerca del proyecto</a>
+  <a href="/reset_and_seed">Cargar datos de ejemplo</a>
+</div>
+
+<hr>
+
+<h3>Funciones disponibles</h3>
+<ul>
+  <li>Registrar nuevos libros en la base de datos SQLite.</li>
+  <li>Buscar libros por título.</li>
+  <li>Actualizar cantidad y precio.</li>
+  <li>Eliminar libros del inventario.</li>
+  <li>Visualizar todos los registros en una tabla.</li>
+</ul>
+
+<p class="pie">Proyecto Flask - Semana 11</p>
+
 {% endblock %}
