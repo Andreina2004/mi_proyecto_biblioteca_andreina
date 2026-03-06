@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from pathlib import Path
 
+from form import LibroForm
+from inventario.inventario import guardar_txt, guardar_json, guardar_csv, leer_txt, leer_json, leer_csv
+
 app = Flask(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -121,7 +124,16 @@ def libros():
             autor = request.form["autor"]
             cantidad = int(request.form["cantidad"])
             precio = float(request.form["precio"])
+
             inventario.agregar(titulo, autor, cantidad, precio)
+
+            libro_form = LibroForm(titulo, autor, cantidad, precio)
+            libro_dict = libro_form.to_dict()
+
+            guardar_txt(libro_dict)
+            guardar_json(libro_dict)
+            guardar_csv(libro_dict)
+
             return redirect(url_for("libros"))
 
         elif accion == "buscar":
@@ -145,6 +157,20 @@ def libros():
 def eliminar_libro(id):
     inventario.eliminar(id)
     return redirect(url_for("libros"))
+
+
+@app.route("/datos")
+def datos():
+    datos_txt = leer_txt()
+    datos_json = leer_json()
+    datos_csv = leer_csv()
+
+    return render_template(
+        "datos.html",
+        datos_txt=datos_txt,
+        datos_json=datos_json,
+        datos_csv=datos_csv
+    )
 
 
 @app.route("/reset_and_seed")

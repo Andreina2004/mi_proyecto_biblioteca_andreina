@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="titulo-panel">Datos almacenados en archivos</h2>
+
+<div class="menu-superior">
+  <a href="/">Inicio</a>
+  <a href="/libros">Volver a Libros</a>
+</div>
+
+<hr>
+
+<h3>Datos en TXT</h3>
+{% if datos_txt %}
+<table>
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for libro in datos_txt %}
+    <tr>
+      <td>{{ libro["titulo"] }}</td>
+      <td>{{ libro["autor"] }}</td>
+      <td>{{ libro["cantidad"] }}</td>
+      <td>{{ libro["precio"] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay datos en TXT.</p>
+{% endif %}
+
+<hr>
+
+<h3>Datos en JSON</h3>
+{% if datos_json %}
+<table>
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for libro in datos_json %}
+    <tr>
+      <td>{{ libro["titulo"] }}</td>
+      <td>{{ libro["autor"] }}</td>
+      <td>{{ libro["cantidad"] }}</td>
+      <td>{{ libro["precio"] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay datos en JSON.</p>
+{% endif %}
+
+<hr>
+
+<h3>Datos en CSV</h3>
+{% if datos_csv %}
+<table>
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for libro in datos_csv %}
+    <tr>
+      <td>{{ libro["titulo"] }}</td>
+      <td>{{ libro["autor"] }}</td>
+      <td>{{ libro["cantidad"] }}</td>
+      <td>{{ libro["precio"] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No hay datos en CSV.</p>
+{% endif %}
+
+{% endblock %}
