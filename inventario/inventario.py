@@ -5,6 +5,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
+# Crear carpeta data si no existe
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
+
 TXT_FILE = os.path.join(DATA_DIR, "datos.txt")
 JSON_FILE = os.path.join(DATA_DIR, "datos.json")
 CSV_FILE = os.path.join(DATA_DIR, "datos.csv")
@@ -53,7 +57,7 @@ def guardar_json(libro):
     datos.append(libro)
 
     with open(JSON_FILE, "w", encoding="utf-8") as f:
-        json.dump(datos, f, indent=4)
+        json.dump(datos, f, indent=4, ensure_ascii=False)
 
 
 # ---------- LEER JSON ----------

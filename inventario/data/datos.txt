@@ -1,1 +1,7 @@
 Mi psicóloga me dijo ,Katherine Hoyer,10,27.0
+ ESTE DOLOR NO ES MIO,MARK WOLYNN,3,30.0
+QUERIDA YO tenemos que hablar,Elizabeth Clapés,5,22.0
+Terapia para llevar,Ana Peréz,2,18.0
+Mi psicóloga me dijo ,Katherine Hoyer,5,27.0
+QUERIDA YO tenemos que hablar,Elizabeth Clapés,5,30.0
+ ESTE DOLOR NO ES MIO,MARK WOLYNN,2,22.0

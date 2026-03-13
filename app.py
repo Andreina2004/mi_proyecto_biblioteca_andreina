@@ -1,34 +1,46 @@
 from flask import Flask, render_template, request, redirect, url_for
-import sqlite3
-from pathlib import Path
+from conexion.conexion import get_conn
 
 from form import LibroForm
 from inventario.inventario import guardar_txt, guardar_json, guardar_csv, leer_txt, leer_json, leer_csv
 
 app = Flask(__name__)
 
-BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = BASE_DIR / "biblioteca.db"
-
-
-def get_conn():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
 
 def init_db():
-    with get_conn() as conn:
-        conn.execute("""
+    try:
+        conn = get_conn()
+        cursor = conn.cursor()
+
+        print("Conectado a MySQL, creando tablas...")
+
+        cursor.execute("""
         CREATE TABLE IF NOT EXISTS libros (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulo TEXT NOT NULL,
-            autor TEXT NOT NULL,
-            cantidad INTEGER NOT NULL,
-            precio REAL NOT NULL
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            titulo VARCHAR(255) NOT NULL,
+            autor VARCHAR(255) NOT NULL,
+            cantidad INT NOT NULL,
+            precio DECIMAL(10,2) NOT NULL
         )
         """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            mail VARCHAR(100) NOT NULL,
+            password VARCHAR(100) NOT NULL
+        )
+        """)
+
         conn.commit()
+        print("Tablas creadas correctamente en MySQL")
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error al crear las tablas:", e)
 
 
 class Libro:
@@ -61,41 +73,64 @@ class Inventario:
         self.lista = []
 
     def cargar(self):
-        with get_conn() as conn:
-            rows = conn.execute("SELECT * FROM libros ORDER BY id ASC").fetchall()
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM libros ORDER BY id ASC")
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-        self.lista = [Libro(r["id"], r["titulo"], r["autor"], r["cantidad"], r["precio"]) for r in rows]
+        self.lista = [
+            Libro(r["id"], r["titulo"], r["autor"], r["cantidad"], float(r["precio"]))
+            for r in rows
+        ]
         self.libros = {l.get_id(): l for l in self.lista}
 
     def agregar(self, titulo, autor, cantidad, precio):
-        with get_conn() as conn:
-            conn.execute(
-                "INSERT INTO libros(titulo, autor, cantidad, precio) VALUES (?, ?, ?, ?)",
-                (titulo, autor, cantidad, precio)
-            )
-            conn.commit()
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO libros (titulo, autor, cantidad, precio) VALUES (%s, %s, %s, %s)",
+            (titulo, autor, cantidad, precio)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def eliminar(self, id):
-        with get_conn() as conn:
-            conn.execute("DELETE FROM libros WHERE id = ?", (id,))
-            conn.commit()
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM libros WHERE id = %s", (id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def actualizar(self, id, cantidad, precio):
-        with get_conn() as conn:
-            conn.execute(
-                "UPDATE libros SET cantidad = ?, precio = ? WHERE id = ?",
-                (cantidad, precio, id)
-            )
-            conn.commit()
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE libros SET cantidad = %s, precio = %s WHERE id = %s",
+            (cantidad, precio, id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def buscar(self, texto):
-        with get_conn() as conn:
-            rows = conn.execute(
-                "SELECT * FROM libros WHERE titulo LIKE ? ORDER BY id ASC",
-                (f"%{texto}%",)
-            ).fetchall()
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT * FROM libros WHERE titulo LIKE %s ORDER BY id ASC",
+            (f"%{texto}%",)
+        )
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-        return [Libro(r["id"], r["titulo"], r["autor"], r["cantidad"], r["precio"]) for r in rows]
+        return [
+            Libro(r["id"], r["titulo"], r["autor"], r["cantidad"], float(r["precio"]))
+            for r in rows
+        ]
 
 
 inventario = Inventario()
@@ -198,17 +233,23 @@ def reset_and_seed():
         ("Frankenstein", "Mary Shelley", 6, 8.99),
     ]
 
-    with get_conn() as conn:
-        conn.execute("DELETE FROM libros")
-        for titulo, autor, cantidad, precio in ejemplos:
-            conn.execute(
-                "INSERT INTO libros(titulo, autor, cantidad, precio) VALUES (?, ?, ?, ?)",
-                (titulo, autor, cantidad, precio)
-            )
-        conn.commit()
+    conn = get_conn()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM libros")
+
+    for titulo, autor, cantidad, precio in ejemplos:
+        cursor.execute(
+            "INSERT INTO libros (titulo, autor, cantidad, precio) VALUES (%s, %s, %s, %s)",
+            (titulo, autor, cantidad, precio)
+        )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return redirect(url_for("libros"))
 
 
 if __name__ == "__main__":
     app.run(debug=True)
+        

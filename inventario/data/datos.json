@@ -1,8 +1,44 @@
 [
     {
-        "titulo": "Mi psic\u00f3loga me dijo ",
+        "titulo": "Mi psicóloga me dijo ",
         "autor": "Katherine Hoyer",
         "cantidad": 10,
         "precio": 27.0
+    },
+    {
+        "titulo": " ESTE DOLOR NO ES MIO",
+        "autor": "MARK WOLYNN",
+        "cantidad": 3,
+        "precio": 30.0
+    },
+    {
+        "titulo": "QUERIDA YO tenemos que hablar",
+        "autor": "Elizabeth Clapés",
+        "cantidad": 5,
+        "precio": 22.0
+    },
+    {
+        "titulo": "Terapia para llevar",
+        "autor": "Ana Peréz",
+        "cantidad": 2,
+        "precio": 18.0
+    },
+    {
+        "titulo": "Mi psicóloga me dijo ",
+        "autor": "Katherine Hoyer",
+        "cantidad": 5,
+        "precio": 27.0
+    },
+    {
+        "titulo": "QUERIDA YO tenemos que hablar",
+        "autor": "Elizabeth Clapés",
+        "cantidad": 5,
+        "precio": 30.0
+    },
+    {
+        "titulo": " ESTE DOLOR NO ES MIO",
+        "autor": "MARK WOLYNN",
+        "cantidad": 2,
+        "precio": 22.0
     }
 ]

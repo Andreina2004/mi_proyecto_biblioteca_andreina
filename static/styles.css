@@ -100,7 +100,7 @@ h3{
 }
 
 .btn-eliminar{
-  background:#8f4737;
+  background:#7a2e22;
 }
 
 table{
@@ -153,4 +153,7 @@ table td{
   margin-top:20px;
   color:#7a5a52;
   font-size:14px;
+}
+table tbody tr:hover{
+  background:#f3e6e2;
 }
