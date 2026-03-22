@@ -1,10 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for
-from conexion.conexion import get_conn
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
+from conexion.conexion import get_conn
 from form import LibroForm
 from inventario.inventario import guardar_txt, guardar_json, guardar_csv, leer_txt, leer_json, leer_csv
 
 app = Flask(__name__)
+app.secret_key = "clave_secreta"
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 
 def init_db():
@@ -28,8 +35,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS usuarios (
             id_usuario INT AUTO_INCREMENT PRIMARY KEY,
             nombre VARCHAR(100) NOT NULL,
-            mail VARCHAR(100) NOT NULL,
-            password VARCHAR(100) NOT NULL
+            mail VARCHAR(100) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL
         )
         """)
 
@@ -41,6 +48,67 @@ def init_db():
 
     except Exception as e:
         print("Error al crear las tablas:", e)
+
+
+class Usuario(UserMixin):
+    def __init__(self, id_usuario, nombre, mail, password):
+        self.id = id_usuario
+        self.nombre = nombre
+        self.mail = mail
+        self.password = password
+
+    @staticmethod
+    def obtener_por_id(id_usuario):
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
+        usuario = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if usuario:
+            return Usuario(
+                usuario["id_usuario"],
+                usuario["nombre"],
+                usuario["mail"],
+                usuario["password"]
+            )
+        return None
+
+    @staticmethod
+    def obtener_por_mail(mail):
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM usuarios WHERE mail = %s", (mail,))
+        usuario = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if usuario:
+            return Usuario(
+                usuario["id_usuario"],
+                usuario["nombre"],
+                usuario["mail"],
+                usuario["password"]
+            )
+        return None
+
+    @staticmethod
+    def crear(nombre, mail, password):
+        conn = get_conn()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO usuarios (nombre, mail, password) VALUES (%s, %s, %s)",
+            (nombre, mail, password)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.obtener_por_id(int(user_id))
 
 
 class Libro:
@@ -147,7 +215,55 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
+    if request.method == "POST":
+        nombre = request.form["nombre"].strip()
+        mail = request.form["mail"].strip().lower()
+        password = request.form["password"]
+
+        usuario_existente = Usuario.obtener_por_mail(mail)
+        if usuario_existente:
+            flash("Ese correo ya está registrado.")
+            return redirect(url_for("registro"))
+
+        password_hash = generate_password_hash(password)
+        Usuario.crear(nombre, mail, password_hash)
+
+        flash("Usuario registrado correctamente. Ahora inicia sesión.")
+        return redirect(url_for("login"))
+
+    return render_template("registro.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        mail = request.form["mail"].strip().lower()
+        password = request.form["password"]
+
+        usuario = Usuario.obtener_por_mail(mail)
+
+        if usuario and check_password_hash(usuario.password, password):
+            login_user(usuario)
+            flash("Inicio de sesión correcto.")
+            return redirect(url_for("libros"))
+        else:
+            flash("Correo o contraseña incorrectos.")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Sesión cerrada correctamente.")
+    return redirect(url_for("login"))
+
+
 @app.route("/libros", methods=["GET", "POST"])
+@login_required
 def libros():
     resultados = None
 
@@ -189,12 +305,14 @@ def libros():
 
 
 @app.route("/libros/eliminar/<int:id>", methods=["POST"])
+@login_required
 def eliminar_libro(id):
     inventario.eliminar(id)
     return redirect(url_for("libros"))
 
 
 @app.route("/datos")
+@login_required
 def datos():
     datos_txt = leer_txt()
     datos_json = leer_json()
@@ -209,6 +327,7 @@ def datos():
 
 
 @app.route("/reset_and_seed")
+@login_required
 def reset_and_seed():
     ejemplos = [
         ("Cien años de soledad", "Gabriel García Márquez", 8, 12.50),
@@ -252,4 +371,3 @@ def reset_and_seed():
 
 if __name__ == "__main__":
     app.run(debug=True)
-        

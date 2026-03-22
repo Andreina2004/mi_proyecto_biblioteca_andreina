@@ -12,9 +12,30 @@
   <nav>
     <a href="/">Inicio</a>
     <a href="/about">Acerca de</a>
-    <a href="/libros">Ver Datos</a>
+
+    {% if current_user.is_authenticated %}
+      <a href="/libros">Ver Datos</a>
+      <a href="/datos">Archivos</a>
+      <span>Hola, {{ current_user.nombre }}</span>
+      <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('registro') }}">Registro</a>
+    {% endif %}
   </nav>
 </header>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="container">
+      <div class="card">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endwith %}
 
 <div class="container">
   <div class="card">
