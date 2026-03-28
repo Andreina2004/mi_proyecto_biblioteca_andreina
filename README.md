@@ -1,44 +1,28 @@
-# Biblioteca Virtual - Sistema de Inventario
+# Sistema de Biblioteca con Flask
 
-Aplicación web desarrollada con Flask para la gestión de inventario de libros.
+Aplicación web desarrollada con Flask y MySQL para la gestión de una biblioteca.
+
+## Funcionalidades
+- Registro e inicio de sesión de usuarios
+- CRUD completo de libros
+- Gestión de préstamos
+- Búsqueda de libros
+- Reportes en PDF de libros y préstamos
+- Base de datos relacional con MySQL
+- Organización por capas: models, services y forms
 
 ## Tecnologías utilizadas
 - Python
 - Flask
-- SQLite
-- HTML
-- CSS
-
-## Funcionalidades
-- Agregar libros
-- Buscar libros por título
-- Actualizar cantidad y precio
-- Eliminar libros
-- Visualizar inventario completo
-
-## Programación Orientada a Objetos
-Se implementó la clase **Libro** para representar cada libro y la clase **Inventario** para gestionar las operaciones.
-
-## Colecciones utilizadas
-- **Listas** para mostrar los libros.
-- **Diccionarios** para acceder rápidamente por ID.
+- MySQL
+- Jinja2
+- FPDF
+- HTML / CSS
 
 ## Base de datos
-Se utiliza **SQLite** con una tabla llamada `libros` que almacena:
-- id
-- titulo
-- autor
-- cantidad
-- precio
+El sistema utiliza tres tablas relacionadas:
+- usuarios
+- libros
+- prestamos
 
-## CRUD implementado
-- Create: agregar libro
-- Read: visualizar inventario
-- Update: actualizar datos
-- Delete: eliminar libro
-
-## Ejecución del proyecto
-Para ejecutar el sistema localmente:
-
-```bash
-python app.py
+## Estructura del proyecto
