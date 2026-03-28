@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="titulo-panel">Gestión de Préstamos</h2>
+
+<div class="menu-superior">
+    <a href="{{ url_for('index') }}">Inicio</a>
+    <a href="{{ url_for('libros') }}">Libros</a>
+    <a href="{{ url_for('about') }}">Acerca de</a>
+</div>
+
+<hr>
+
+<h3>Registrar préstamo</h3>
+<form method="post" class="form-inline">
+    <label>Usuario:</label>
+    <select name="id_usuario" required>
+        {% for u in usuarios %}
+            <option value="{{ u.id_usuario }}">{{ u.nombre }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Libro:</label>
+    <select name="id_libro" required>
+        {% for l in libros %}
+            <option value="{{ l.id }}">{{ l.titulo }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Fecha préstamo:</label>
+    <input type="date" name="fecha_prestamo" required>
+
+    <label>Fecha devolución:</label>
+    <input type="date" name="fecha_devolucion" required>
+
+    <label>Estado:</label>
+    <input type="text" name="estado" value="Prestado" required>
+
+    <button type="submit">Registrar préstamo</button>
+</form>
+
+<hr>
+
+<h3>Lista de préstamos</h3>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Libro</th>
+            <th>Fecha préstamo</th>
+            <th>Fecha devolución</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in prestamos %}
+        <tr>
+            <td>{{ p.id_prestamo }}</td>
+            <td>{{ p.usuario }}</td>
+            <td>{{ p.libro }}</td>
+            <td>{{ p.fecha_prestamo }}</td>
+            <td>{{ p.fecha_devolucion }}</td>
+            <td>{{ p.estado }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

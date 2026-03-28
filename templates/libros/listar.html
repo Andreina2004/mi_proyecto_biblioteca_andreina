@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="titulo-panel">Biblioteca Virtual - Sistema de Gestión</h2>
+
+<div class="menu-superior">
+  <a href="/">Inicio</a>
+  <a href="/about">Acerca de</a>
+  <a href="{{ url_for('crear_libro') }}">Agregar Libro</a>
+  <a href="{{ url_for('datos') }}">Ver archivos guardados</a>
+  <a href="{{ url_for('reporte_libros_pdf') }}" class="btn btn-danger mb-3">
+    Descargar PDF
+  </a>
+</div>
+
+<hr>
+
+<h3>Buscar Libro</h3>
+<form action="{{ url_for('buscar_libro') }}" method="post" class="form-inline">
+  <input type="text" name="buscar" placeholder="Buscar por título o autor" required>
+  <button type="submit">Buscar</button>
+</form>
+
+<hr>
+
+<h3>Inventario de Libros</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in libros %}
+    <tr>
+      <td>{{ l.id }}</td>
+      <td>{{ l.titulo }}</td>
+      <td>{{ l.autor }}</td>
+      <td>{{ l.cantidad }}</td>
+      <td>${{ l.precio }}</td>
+      <td>
+        <a href="{{ url_for('editar_libro', id=l.id) }}">Editar</a>
+        <a href="{{ url_for('prestamos') }}">Préstamos</a>
+
+        <form action="{{ url_for('eliminar_libro', id=l.id) }}" method="post" class="form-eliminar" style="display:inline;">
+          <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este libro?')">
+            Eliminar
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p class="pie">Proyecto Flask - Semana 15</p>
+
+{% endblock %}
